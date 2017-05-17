@@ -1,0 +1,27 @@
+version: "3"
+volumes:
+  organisation-data:
+    driver: local
+    driver_opts:
+      type: nfs
+      device: :/vol1/organisation
+      o: addr=172.21.12.30,rw
+
+services:
+  api:
+    image: registry.popcube.xyz:5000/pop_deploy:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - organisation-data:/organisation
+    environment:
+      DOCKER_REGISTRY: registry.popcube.xyz:5000
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.40'
+          memory: 90M
+        reservations:
+          cpus: '0.10'
+          memory: 10M
