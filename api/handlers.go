@@ -11,6 +11,7 @@ import (
 	"io"
 	"github.com/gorilla/mux"
 	"strings"
+	"strconv"
 )
 
 func Index(w http.ResponseWriter, r *http.Request) {
@@ -191,7 +192,7 @@ func deploy_status(w http.ResponseWriter, r *http.Request) {
 	stack_name := vars["name"]
 
 	// docker stack services hyrule -q
-	args := []string{"stack", "services", stack_name, "-q"}
+  args := []string{"stack", "services", stack_name, "-q"}
 	nb_service, err := exec.Command("docker", args...).Output();
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
@@ -200,7 +201,7 @@ func deploy_status(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	nb_service_running, err := exec.Command("for service_id in $(docker stack services "+stack_name+" -q); do docker service ps $service_id -f desired-state=Running -q; done").Output();
+	nb_service_running, err := exec.Command("sh","-c","for service_id in $(docker stack services "+stack_name+" -q); do docker service ps $service_id -f desired-state=Running -q; done").Output();
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(500)
@@ -209,10 +210,11 @@ func deploy_status(w http.ResponseWriter, r *http.Request) {
 	}
 	if (strings.Count(string(nb_service), "\n")) != (strings.Count(string(nb_service_running), "\n")) {
 		if (strings.Count(string(nb_service_running), "\n")) == 0 {
-			json.NewEncoder(w).Encode(Response_status{Message: "Critical", Service: string(nb_service_running)+"/"+string(nb_service)})
+			json.NewEncoder(w).Encode(Response_status{Message: "Critical", Service: strconv.Itoa(strings.Count(string(nb_service_running), "\n"))+"/"+strconv.Itoa(strings.Count(string(nb_service), "\n"))})
 			} else {
-				json.NewEncoder(w).Encode(Response_status{Message: "Warning", Service: string(nb_service_running)+"/"+string(nb_service)})
+				json.NewEncoder(w).Encode(Response_status{Message: "Warning", Service: strconv.Itoa(strings.Count(string(nb_service_running), "\n"))+"/"+strconv.Itoa(strings.Count(string(nb_service), "\n"))})
 			}
+			return
 		}
-		json.NewEncoder(w).Encode(Response_status{Message: "Ok", Service: string(nb_service_running)+"/"+string(nb_service)})
+		json.NewEncoder(w).Encode(Response_status{Message: "Ok", Service: strconv.Itoa(strings.Count(string(nb_service_running), "\n"))+"/"+strconv.Itoa(strings.Count(string(nb_service), "\n"))})
 	}
