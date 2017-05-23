@@ -33,7 +33,7 @@ var routes = Routes{
 	Route{
 		"deploy_status",
 		"POST",
-		"/deploy/stack/status",
+		"/deploy/stack/{name}/status",
 		deploy_status,
 	},
 }

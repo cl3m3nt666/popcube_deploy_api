@@ -9,6 +9,8 @@ import (
 	"math/rand"
 	"time"
 	"io"
+	"github.com/gorilla/mux"
+	"strings"
 )
 
 func Index(w http.ResponseWriter, r *http.Request) {
@@ -176,7 +178,7 @@ func deploy_create(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(jsonErr{Code: 500, Text: "Exec Deployement  :  "+err.Error()})
 		return
 	}
-	json.NewEncoder(w).Encode(Response{Message: "Success", Url: create_stack.Name+"."+os.Getenv("DEFAULT_DOMAIN"), Stack_name: os.Getenv("ORGANISATION")})
+	json.NewEncoder(w).Encode(Response_create{Message: "Success", Url: create_stack.Name+"."+os.Getenv("DEFAULT_DOMAIN"), Stack_name: os.Getenv("ORGANISATION")})
 }
 
 func deploy_remove(w http.ResponseWriter, r *http.Request) {
@@ -184,5 +186,33 @@ func deploy_remove(w http.ResponseWriter, r *http.Request) {
 }
 
 func deploy_status(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Welcome deploy_status\n")
-}
+
+	vars := mux.Vars(r)
+	stack_name := vars["name"]
+
+	// docker stack services hyrule -q
+	args := []string{"stack", "services", stack_name, "-q"}
+	nb_service, err := exec.Command("docker", args...).Output();
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(500)
+		json.NewEncoder(w).Encode(jsonErr{Code: 500, Text: "Exec nb_service  :  "+err.Error()})
+		return
+	}
+
+	nb_service_running, err := exec.Command("for service_id in $(docker stack services "+stack_name+" -q); do docker service ps $service_id -f desired-state=Running -q; done").Output();
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(500)
+		json.NewEncoder(w).Encode(jsonErr{Code: 500, Text: "Exec nb_service_running  :  "+err.Error()})
+		return
+	}
+	if (strings.Count(string(nb_service), "\n")) != (strings.Count(string(nb_service_running), "\n")) {
+		if (strings.Count(string(nb_service_running), "\n")) == 0 {
+			json.NewEncoder(w).Encode(Response_status{Message: "Critical", Service: string(nb_service_running)+"/"+string(nb_service)})
+			} else {
+				json.NewEncoder(w).Encode(Response_status{Message: "Warning", Service: string(nb_service_running)+"/"+string(nb_service)})
+			}
+		}
+		json.NewEncoder(w).Encode(Response_status{Message: "Ok", Service: string(nb_service_running)+"/"+string(nb_service)})
+	}

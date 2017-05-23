@@ -6,8 +6,13 @@ type Create_stack struct {
 }
 
 
-type Response struct {
-	Message  string `json:"Message"`
+type Response_create struct {
+	Message  string `json:"message"`
   Url  string `json:"url"`
   Stack_name  string `json:"stack_name"`
+}
+
+type Response_status struct {
+	Message  string `json:"message"`
+  Service  string `json:"service"`
 }
