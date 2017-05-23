@@ -13,23 +13,18 @@ env:
 before_install:
   - apt-cache madison docker-engine
   - sudo apt-get -o Dpkg::Options::="--force-confnew" install -y docker-engine=${DOCKER_VERSION}
-  - sudo rm -f /usr/local/bin/docker-compose
-  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
-  - chmod +x docker-compose
 
 script:
   - docker version
-  - docker-compose version
-  - docker login -u="$DOCKER_USER" -p="$DOCKER_PWD" $DOCKER_REGISTRY
-  - docker build -t $DOCKER_REGISTRY/pop_deploy .;
+  - docker build -t $DOCKER_REGISTRY/pop_deploy .
 
 after_success:
-   - >-
-     if [ "$TRAVIS_BRANCH" == "master" ]; then
-     docker login -u="$DOCKER_USER" -p="$DOCKER_PWD" $DOCKER_REGISTRY;
-     docker build -t $DOCKER_REGISTRY/pop_deploy .;
-     docker push $DOCKER_REGISTRY/pop_deploy:latest;
-     fi
+  - >-
+   if [ "$TRAVIS_BRANCH" == "master" ]; then
+   docker login -u="$DOCKER_USER" -p="$DOCKER_PWD" $DOCKER_REGISTRY;
+   docker build -t $DOCKER_REGISTRY/pop_deploy .;
+   docker push $DOCKER_REGISTRY/pop_deploy:latest;
+   fi
 
 
 notifications:
