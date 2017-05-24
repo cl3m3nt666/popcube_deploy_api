@@ -16,3 +16,8 @@ type Response_status struct {
 	Message  string `json:"message"`
   Service  string `json:"service"`
 }
+
+
+type Response_remove struct {
+	Message  string `json:"message"`
+}

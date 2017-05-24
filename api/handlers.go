@@ -183,7 +183,16 @@ func deploy_create(w http.ResponseWriter, r *http.Request) {
 }
 
 func deploy_remove(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Welcome deploy_remove\n")
+	vars := mux.Vars(r)
+	stack_name := vars["name"]
+	args := []string{"stack", "rm", stack_name}
+	if err := exec.Command("docker", args...).Run(); err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(500)
+		json.NewEncoder(w).Encode(jsonErr{Code: 500, Text: "Exec remove  :  "+err.Error()})
+		return
+	}
+	json.NewEncoder(w).Encode(Response_remove{Message: "Success"})
 }
 
 func deploy_status(w http.ResponseWriter, r *http.Request) {
@@ -216,5 +225,5 @@ func deploy_status(w http.ResponseWriter, r *http.Request) {
 			}
 			return
 		}
-		json.NewEncoder(w).Encode(Response_status{Message: "Ok", Service: strconv.Itoa(strings.Count(string(nb_service_running), "\n"))+"/"+strconv.Itoa(strings.Count(string(nb_service), "\n"))})
+		json.NewEncoder(w).Encode(Response_status{Message: "Success", Service: strconv.Itoa(strings.Count(string(nb_service_running), "\n"))+"/"+strconv.Itoa(strings.Count(string(nb_service), "\n"))})
 	}

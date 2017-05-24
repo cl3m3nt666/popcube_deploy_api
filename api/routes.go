@@ -27,7 +27,7 @@ var routes = Routes{
 	Route{
 		"deploy_remove",
 		"POST",
-		"/deploy/stack/remove",
+		"/deploy/stack/{name}/remove",
 		deploy_remove,
 	},
 	Route{
