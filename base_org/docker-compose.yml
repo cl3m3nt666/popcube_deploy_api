@@ -6,6 +6,10 @@ networks:
   database-network:
     external: true
 
+volumes:
+  test-vol:
+    driver: local
+
 services:
   api:
     image: registry.popcube.xyz:5000/popcubeapi:alpha-1.1.11
@@ -34,6 +38,8 @@ services:
           memory: 10M
   database:
     image: registry.popcube.xyz:5000/popcubedb_base:latest
+    volumes:
+      - database-vol:/var/lib/mysql
     env_file: ${PATH_ENV_FILE:-.env}
     networks:
       - database-network
