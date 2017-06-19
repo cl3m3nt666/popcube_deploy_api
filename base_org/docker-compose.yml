@@ -37,6 +37,8 @@ services:
     env_file: ${PATH_ENV_FILE:-.env}
     networks:
       - database-network
+    volumes:
+      - database:/var/lib/mysql
     deploy:
       mode: replicated
       replicas: 1
@@ -46,3 +48,5 @@ services:
           memory: 450M
         reservations:
           cpus: '0.20'
+volumes:
+  database:

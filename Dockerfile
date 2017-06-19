@@ -31,10 +31,10 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 COPY base_org /organisation_template
-COPY api/ /go/api
+#COPY api/ /go/api
 COPY run.sh /bin
 
-WORKDIR /go/api
+#WORKDIR /go/api
 VOLUME ["/organisation"]
 
 EXPOSE 80
