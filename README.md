@@ -2,6 +2,19 @@
 
 [![Build Status](https://travis-ci.com/cl3m3nt666/popcube_deploy_api.svg?token=pQ5JuFHLtUEwNb123zaH&branch=master)](https://travis-ci.com/cl3m3nt666/popcube_deploy_api)
 
+## Descriptions
+
+API to deploy an organization for the popcube project.
+
+## Routes
+
+| Methodes | path |
+| :------- |:------|
+| GET | / |
+| POST | /deploy/stack/create |
+| POST | /deploy/stack/{name}/remove |
+| POST | /deploy/stack/{name}/status |
+
 ## Environment variable
 
 | Name | default value |
